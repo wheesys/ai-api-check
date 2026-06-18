@@ -1,0 +1,41 @@
+# ---------- 通用 ----------
+.DS_Store
+Thumbs.db
+*.log
+.idea/
+.vscode/
+*.local
+
+# ---------- 环境变量与密钥（严禁提交）----------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# ---------- Python / FastAPI ----------
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# ---------- Node / Vue ----------
+node_modules/
+.pnpm-store/
+.npm/
+dist-ssr/
+coverage/
+*.tsbuildinfo
+
+# ---------- 数据库 / 运行时数据 ----------
+*.sqlite3
+*.db
