@@ -22,21 +22,23 @@
 - [x] 错误处理与边界设计（统一错误分类 + 重试退避 + 探针级容错 + 边界条件，见设计 v1.0 第 11 节）
 - [x] 报告与 PDF 设计（九区块报告结构 + ECharts 图表 + weasyprint 导出流程 + 红线脱敏，见设计 v1.1 第 12 节）
 - [x] 测试策略（三层测试 + 评分模型核心测试 + 适配器双路径 + 零网络夹具/Key 脱敏回归，见设计 v1.2 第 13 节）
-- [ ] 设计文档完整评审（自检 + 用户评审）
+- [x] 设计文档完整评审（自检评审输出 7 项发现 → v1.3 全部修订闭环；用户评审通过）
 
 ---
 
 ## 阶段二：实施规划
 
-- [ ] 生成详细实施计划（writing-plans）
-- [ ] 确认 Docker 时区需求（若使用 docker-compose）
+- [x] 生成详细实施计划（writing-plans，见 [docs/superpowers/plans/2026-06-20-implementation-plan.md](../docs/superpowers/plans/2026-06-20-implementation-plan.md)，38 任务 127 步）
+- [ ] 确认 Docker 时区需求（若使用 docker-compose，延后至 Task 38）
 
 ---
 
 ## 阶段三：工程搭建
 
-- [ ] 项目脚手架（后端 FastAPI / 前端 Vue3 + Naive UI / SQLite）
-- [ ] 数据库 schema 与迁移（遵循 DB 规则 3.2）
+- [~] 项目脚手架（后端 FastAPI / 前端 Vue3 + Naive UI / SQLite）—— **后端基础设施完成（Task 1-5）**：venv+依赖、config/main(lifespan)、ORM、安全、适配器框架、HTTP 客户端；前端待 Phase 6
+- [x] 数据库 schema 与迁移（遵循 DB 规则 3.2）—— **Task 2 已完成**：六表 ORM（整数主键/无外键/datetime/价格 TEXT/全字段注释）+ Pydantic DTO + lifespan 建表 + 数据字典 [DATABASE_SCHEMA.md](./DATABASE_SCHEMA.md)，7 项集成测试通过
+- [x] API Key 加密存储 + 日志脱敏（安全规则 3.5）—— **Task 3 已完成**：Fernet `KeyManager`（主密钥不入库/不回显）+ `ErrorSanitizer`（Key/token/Authorization 正则脱敏 + 敏感头剔除），10 项单测通过
+- [x] Provider 适配器框架 + 统一错误模型 + 异步 HTTP 客户端 —— **Task 4-5 已完成**：`ProviderAdapter` 抽象 + `AdapterFactory` 注册表（SOLID-O）、九类 `ErrorCategory`/`ProbeError`、aiohttp+tenacity 退避重试客户端，共 11 项单测通过
 - [ ] API Key 加密存储 + 日志脱敏（安全规则 3.5）
 - [ ] README（含许可证展示格式 `许可证名称 © 年份 作者`）
 
