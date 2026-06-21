@@ -5,10 +5,17 @@
 无需感知具体探针实现模块（SOLID-O/-D）。
 """
 from app.probes import (  # noqa: F401  触发注册副作用
+    authenticity,
     billing,
     capability,
     connectivity,
     performance,
 )
 
-__all__ = ["billing", "capability", "connectivity", "performance"]
+__all__ = [
+    "authenticity",
+    "billing",
+    "capability",
+    "connectivity",
+    "performance",
+]
