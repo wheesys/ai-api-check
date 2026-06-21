@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>模型质量检测报告 - {{ model.display_name or model.model_name if model else task.id }}</title>
+  <style>
+    /* A4 版式 + CJK 字体回退（weasyprint 经系统字体渲染中文） */
+    @page { size: A4; margin: 1.6cm 1.4cm; }
+    body {
+      font-family: "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", "Heiti SC", sans-serif;
+      color: #1f2933; font-size: 11px; line-height: 1.55;
+    }
+    h1 { font-size: 20px; margin: 0 0 4px; }
+    h2 { font-size: 14px; margin: 18px 0 8px; padding-bottom: 4px; border-bottom: 2px solid #2d8cf0; color: #1c5fa8; }
+    .muted { color: #66788a; font-size: 10px; }
+    .grid { display: flex; flex-wrap: wrap; gap: 10px; }
+    .card { border: 1px solid #e0e6ed; border-radius: 6px; padding: 10px 12px; flex: 1 1 30%; }
+    .card .label { color: #66788a; font-size: 10px; }
+    .card .value { font-size: 20px; font-weight: 700; }
+    table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+    th, td { border: 1px solid #e0e6ed; padding: 5px 7px; text-align: left; vertical-align: top; }
+    th { background: #f4f7fb; font-weight: 600; }
+    .badge { display: inline-block; padding: 1px 7px; border-radius: 10px; font-size: 10px; color: #fff; }
+    .pass { background: #19be6b; } .degraded { background: #ff9900; }
+    .fail { background: #ed4014; } .skipped { background: #909399; }
+    .level-normal { color: #19be6b; font-weight: 700; }
+    .level-suspicious { color: #ff9900; font-weight: 700; }
+    .level-highly_suspicious { color: #ed4014; font-weight: 700; }
+    .chart { text-align: center; margin: 8px 0; }
+    .chart img { max-width: 100%; max-height: 280px; }
+    .signal-refute { color: #ed4014; } .signal-confirm { color: #19be6b; }
+  </style>
+</head>
+<body>
+  <!-- ① 报告头 -->
+  <h1>中转站模型质量检测报告</h1>
+  <div class="muted">
+    模型：{{ model.display_name or model.model_name if model else "—" }}
+    {% if model %}（{{ model.protocol }} / {{ model.access_mode }}）{% endif %}
+    · 任务 #{{ task.id }} · 状态 {{ task.status }}
+    {% if task.finished_at %} · 完成于 {{ task.finished_at }}{% endif %}
+  </div>
+
+  <!-- ② 总览 -->
+  <h2>① 综合评分总览</h2>
+  {% if summary %}
+  <div class="grid">
+    <div class="card"><div class="label">综合评分</div><div class="value">{{ summary.overall_score if summary.overall_score is not none else "不可用" }}</div></div>
+    <div class="card"><div class="label">连通性</div><div class="value">{{ summary.connectivity_score if summary.connectivity_score is not none else "—" }}</div></div>
+    <div class="card"><div class="label">性能</div><div class="value">{{ summary.performance_score if summary.performance_score is not none else "—" }}</div></div>
+    <div class="card"><div class="label">计费一致性</div><div class="value">{{ summary.billing_score if summary.billing_score is not none else "—" }}</div></div>
+    <div class="card"><div class="label">能力</div><div class="value">{{ summary.capability_score if summary.capability_score is not none else "—" }}</div></div>
+    <div class="card"><div class="label">真实性</div><div class="value">{{ summary.authenticity_score if summary.authenticity_score is not none else "—" }}</div></div>
+  </div>
+  {% else %}
+  <p class="muted">结果尚未就绪或任务未正常完成。</p>
+  {% endif %}
+  {% if charts and charts.radar %}<div class="chart"><img src="{{ charts.radar }}" alt="雷达图" /></div>{% endif %}
+
+  <!-- ③ 真实性专章 -->
+  {% set auth = summary.authenticity_subscores if summary else none %}
+  {% if auth %}
+  <h2>② 来源真实性分析</h2>
+  <div class="grid">
+    <div class="card"><div class="label">非套壳可信度 (shell)</div><div class="value">{{ auth.shell_score }}</div></div>
+    <div class="card"><div class="label">官方直供可信度 (direct)</div><div class="value">{{ auth.direct_score }}</div></div>
+    <div class="card"><div class="label">真实性（短板）</div><div class="value">{{ auth.authenticity_score }}</div></div>
+  </div>
+  <p>分级：<span class="level-{{ auth.level }}">{{ auth.level }}</span>
+     · 置信度 {{ auth.confidence }} · 阈值 H={{ auth.high_threshold }}/L={{ auth.low_threshold }}
+     {% if auth.b_group_confirmed %} · <strong>B 组一票确证</strong>{% endif %}
+  </p>
+  {% if auth.signals %}
+  <table>
+    <thead><tr><th>信号</th><th>方向</th><th>贡献分</th><th>证据</th></tr></thead>
+    <tbody>
+      {% for sig in auth.signals if sig.contribution %}
+      <tr>
+        <td>{{ sig.key }}</td>
+        <td class="signal-{{ sig.direction }}">{{ "证真" if sig.direction == "confirm" else "证伪" }}</td>
+        <td>{{ sig.contribution }}</td>
+        <td class="muted">{{ sig.evidence }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+  {% endif %}
+
+  <!-- ④~⑧ 各维度策略明细 -->
+  <h2>③ 检测策略明细</h2>
+  <table>
+    <thead><tr><th>维度</th><th>策略</th><th>状态</th><th>得分</th><th>指标/证据</th></tr></thead>
+    <tbody>
+      {% for s in strategies %}
+      <tr>
+        <td>{{ s.category }}</td>
+        <td>{{ s.name }}</td>
+        <td><span class="badge {{ s.status }}">{{ s.status }}</span></td>
+        <td>{{ s.score if s.score is not none else "—" }}</td>
+        <td class="muted">{{ s.metrics or s.evidence or "" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- ⑨ 检测完整性 -->
+  <h2>④ 检测完整性</h2>
+  {% set skipped = strategies | selectattr("status", "equalto", "skipped") | list %}
+  {% if skipped %}
+  <p class="muted">以下策略未实际检测（不计负分）：
+    {% for s in skipped %}{{ s.name }}{% if not loop.last %}、{% endif %}{% endfor %}。
+    兼容层路径下功能性指纹探针整组跳过，真实性判定置信度相应下降。</p>
+  {% else %}
+  <p class="muted">全部启用策略均已执行。</p>
+  {% endif %}
+
+  <div class="muted" style="margin-top: 24px; text-align: center;">
+    本报告仅给出"可信度分级"，非铁证；阈值与权重可按实际样本校准。
+  </div>
+</body>
+</html>
