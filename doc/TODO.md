@@ -49,8 +49,8 @@
 - [ ] 中转站 CRUD（协议集合多选 + 自定义地址/Key/名称）
 - [ ] 模型列表自动拉取（OpenAI/Anthropic/Gemini 原生 + Gemini 兼容层；失败回退手输）
 - [x] Provider 适配器（OpenAI / Anthropic / **Gemini 原生+兼容层双路径** / 兼容）—— **Task 6-8 已完成**：OpenAIAdapter、AnthropicAdapter、GeminiNativeAdapter（Developer/Vertex 双风格端点路由 + `:countTokens` + 功能性指纹字段提取）、GeminiOpenAICompatAdapter（复用 OpenAI 解析）；包导入即自注册四组合，共 47 项单测通过
-- [ ] 检测引擎：异步任务池 + SSE 进度
-- [ ] 探针集：连通性 / 性能(TTFT/吞吐) / 计费一致性 / 能力探测（含 Gemini `usageMetadata`/`:countTokens` 解析）
+- [~] 检测引擎：异步任务池 + SSE 进度
+- [~] 探针集：连通性 / 性能(TTFT/吞吐) / 计费一致性 / 能力探测（含 Gemini `usageMetadata`/`:countTokens` 解析）—— **Task 9-10 已完成**：探针抽象框架（Probe/ProbeContext/ProbeResult/ProbeStatus + ProbeRegistry 按类分组）、连通性探针、TTFT/吞吐/稳定性性能探针（可注入时钟确定性测耗时），共 24 项单测通过；计费/能力探针待 Task 11
 - [ ] 真实性探针：套壳换底特征 + 逆向/工具转出特征（含 Gemini CLI/AI Studio/Antigravity 逆向特征）
 - [ ] **Gemini 功能性指纹探针**：搜索接地/URL Context/代码执行/思考/受控输出/缓存/logprobs/Vertex RAG 等偏门功能主动探测 + Studio/Vertex 来源定位（见设计 v0.3 第 7.5 节，仅 native 路径）
 - [ ] 真实性评分模型（加权 + 分级阈值，阈值可调）
