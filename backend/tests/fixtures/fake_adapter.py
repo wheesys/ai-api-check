@@ -27,18 +27,29 @@ class FakeAdapter(ProviderAdapter):
         chat_sequence: list[AdapterResponse | Exception] | None = None,
         stream_chunks: list[StreamChunk] | None = None,
         stream_error: Exception | None = None,
+        fail_above_chars: int | None = None,
     ) -> None:
         self._chat_response = chat_response
         self._chat_error = chat_error
         self._chat_sequence = chat_sequence
         self._stream_chunks = stream_chunks or []
         self._stream_error = stream_error
+        # 输入总字符超过该阈值时抛能力错误，用于上下文长度二分逼近测试
+        self._fail_above_chars = fail_above_chars
         self.chat_calls = 0
         self.stream_calls = 0
 
     async def chat(self, request: AdapterRequest) -> AdapterResponse:
         index = self.chat_calls
         self.chat_calls += 1
+        if self._fail_above_chars is not None:
+            total_chars = sum(len(message.content) for message in request.messages)
+            if total_chars > self._fail_above_chars:
+                from app.utils.errors import ErrorCategory, ProbeError
+
+                raise ProbeError(
+                    ErrorCategory.CAPABILITY, "超出上下文上限", http_status=400
+                )
         if self._chat_sequence is not None:
             item = self._chat_sequence[index % len(self._chat_sequence)]
             if isinstance(item, Exception):

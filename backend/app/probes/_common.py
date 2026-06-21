@@ -13,6 +13,13 @@ PING_MESSAGES = [ChatMessage(role="user", content="ping")]
 PERF_PROMPT_MESSAGES = [
     ChatMessage(role="user", content="用一句话介绍你自己。")
 ]
+# 计费一致性提示（固定已知文本，便于本地 tokenizer 估算与申报 usage 比对）
+BILLING_PROMPT_MESSAGES = [
+    ChatMessage(
+        role="user",
+        content="请逐字复述这句话：人工智能正在重塑软件工程的协作方式。",
+    )
+]
 
 
 def grade_lower_better(

@@ -67,6 +67,7 @@ class ProbeContext:
     thresholds: dict = field(default_factory=dict)  # 阈值表（ttft/吞吐/偏差率等）
     budget: BudgetCounter | None = None  # 预算计数器；None 表示不限制
     is_cancelled: Callable[[], bool] = lambda: False  # 取消判定回调
+    declared_capabilities: set[str] = field(default_factory=set)  # 模型声明能力，裁剪能力探针
 
     def cancelled(self) -> bool:
         """是否已被取消（引擎在用户中止时翻转）。"""
