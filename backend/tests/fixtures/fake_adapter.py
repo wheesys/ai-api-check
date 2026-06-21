@@ -28,6 +28,9 @@ class FakeAdapter(ProviderAdapter):
         stream_chunks: list[StreamChunk] | None = None,
         stream_error: Exception | None = None,
         fail_above_chars: int | None = None,
+        protocol: str | None = None,
+        access_mode: str | None = None,
+        count_tokens_value: int | None = None,
     ) -> None:
         self._chat_response = chat_response
         self._chat_error = chat_error
@@ -36,6 +39,13 @@ class FakeAdapter(ProviderAdapter):
         self._stream_error = stream_error
         # 输入总字符超过该阈值时抛能力错误，用于上下文长度二分逼近测试
         self._fail_above_chars = fail_above_chars
+        # 实例级覆盖协议/接入形态，便于 Gemini 功能性指纹探针适用性测试
+        if protocol is not None:
+            self.protocol = protocol
+        if access_mode is not None:
+            self.access_mode = access_mode
+        # :countTokens 返回值；None 表示该适配器不提供该方法（缺方法时探针应 SKIPPED）
+        self._count_tokens_value = count_tokens_value
         self.chat_calls = 0
         self.stream_calls = 0
 
@@ -71,6 +81,10 @@ class FakeAdapter(ProviderAdapter):
 
     async def fetch_models(self) -> list[ModelInfo]:
         return []
+
+    async def count_tokens(self, request: AdapterRequest) -> int | None:
+        """模拟 Gemini :countTokens；返回 None 表示不可用（探针应 SKIPPED）。"""
+        return self._count_tokens_value
 
 
 class FakeClock:

@@ -119,6 +119,10 @@ def extract_feature_flags(body: dict) -> dict:
             flags["safety_ratings"] = first["safetyRatings"]
         if first.get("groundingMetadata"):
             flags["grounding_metadata"] = first["groundingMetadata"]
+        if first.get("logprobsResult"):
+            flags["logprobs_result"] = first["logprobsResult"]
+        if first.get("avgLogprobs") is not None:
+            flags["avg_logprobs"] = first["avgLogprobs"]
         url_context = first.get("urlContextMetadata") or first.get(
             "url_context_metadata"
         )

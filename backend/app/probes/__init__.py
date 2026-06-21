@@ -9,6 +9,7 @@ from app.probes import (  # noqa: F401  触发注册副作用
     billing,
     capability,
     connectivity,
+    gemini_features,
     performance,
 )
 
@@ -17,5 +18,6 @@ __all__ = [
     "billing",
     "capability",
     "connectivity",
+    "gemini_features",
     "performance",
 ]
