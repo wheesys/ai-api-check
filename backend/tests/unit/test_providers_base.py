@@ -64,3 +64,17 @@ def test_factory_unknown_combo_raises():
     """未注册组合应抛 ValueError。"""
     with pytest.raises(ValueError, match="未注册的适配器组合"):
         AdapterFactory.create("does_not_exist", "native")
+
+
+def test_package_import_registers_all_production_adapters():
+    """导入 app.providers 即触发全部生产适配器自注册（注册表模式）。"""
+    import app.providers  # noqa: F401  触发注册副作用
+
+    keys = set(AdapterFactory.registered_keys())
+    expected = {
+        ("openai", "native"),
+        ("anthropic", "native"),
+        ("gemini", "native"),
+        ("gemini", "openai_compat"),
+    }
+    assert expected <= keys
