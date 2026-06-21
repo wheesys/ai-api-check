@@ -29,6 +29,29 @@ _COMPAT_MODE = "openai_compat"
 # 多模态视为已声明能力的标识集合（与 capability 探针保持一致，DRY 语义）
 _MULTIMODAL_CAPS = {"multimodal", "vision"}
 
+# A/B 组 strategy_key 集合（供评分层 §9.5 桥接：A 双向、B 一票确证），与下方注册一致
+A_GROUP_KEYS = frozenset(
+    {
+        "gemini_thinking",
+        "gemini_code_execution",
+        "gemini_search_grounding",
+        "gemini_json_schema",
+        "gemini_caching",
+        "gemini_logprobs",
+        "gemini_safety_ratings",
+        "gemini_token_consistency",
+        "gemini_multimodal_timestamp",
+    }
+)
+B_GROUP_KEYS = frozenset(
+    {
+        "gemini_url_context",
+        "gemini_vertex_rag",
+        "gemini_maps_grounding",
+        "gemini_safety_severity",
+    }
+)
+
 
 def _is_capability_error(error: ProbeError) -> bool:
     """是否为"能力不支持"类错误（上游 400 参数/功能不支持）。"""
