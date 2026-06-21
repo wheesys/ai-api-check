@@ -8,7 +8,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import stations
+from app.api import stations, tasks
 from app.config import settings
 from app.database.migrations import init_db
 
@@ -44,3 +44,4 @@ async def health_check():
 
 
 app.include_router(stations.router)
+app.include_router(tasks.router)
