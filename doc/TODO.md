@@ -48,7 +48,7 @@
 
 - [ ] 中转站 CRUD（协议集合多选 + 自定义地址/Key/名称）
 - [ ] 模型列表自动拉取（OpenAI/Anthropic/Gemini 原生 + Gemini 兼容层；失败回退手输）
-- [ ] Provider 适配器（OpenAI / Anthropic / **Gemini 原生+兼容层双路径** / 兼容）
+- [x] Provider 适配器（OpenAI / Anthropic / **Gemini 原生+兼容层双路径** / 兼容）—— **Task 6-8 已完成**：OpenAIAdapter、AnthropicAdapter、GeminiNativeAdapter（Developer/Vertex 双风格端点路由 + `:countTokens` + 功能性指纹字段提取）、GeminiOpenAICompatAdapter（复用 OpenAI 解析）；包导入即自注册四组合，共 47 项单测通过
 - [ ] 检测引擎：异步任务池 + SSE 进度
 - [ ] 探针集：连通性 / 性能(TTFT/吞吐) / 计费一致性 / 能力探测（含 Gemini `usageMetadata`/`:countTokens` 解析）
 - [ ] 真实性探针：套壳换底特征 + 逆向/工具转出特征（含 Gemini CLI/AI Studio/Antigravity 逆向特征）
