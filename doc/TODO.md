@@ -46,8 +46,8 @@
 
 ## 阶段四：核心功能实现
 
-- [ ] 中转站 CRUD（协议集合多选 + 自定义地址/Key/名称）
-- [ ] 模型列表自动拉取（OpenAI/Anthropic/Gemini 原生 + Gemini 兼容层；失败回退手输）
+- [x] 中转站 CRUD（协议集合多选 + 自定义地址/Key/名称）—— **Task 21 已完成**：`StationService`（Fernet 加密落库、响应经 to_response 仅暴露 has_api_key 不回显 Key/密文、protocols JSON 序列化）+ 中转站 CRUD 五端点
+- [x] 模型列表自动拉取（OpenAI/Anthropic/Gemini 原生 + Gemini 兼容层；失败回退手输）—— **Task 21 已完成**：`ModelService` 多适配器并行拉取、(protocol,model_name,access_mode) 三元组去重（含库内去重）、部分失败逐项脱敏记录、全失败回退手输；模型列表/手动录入/拉取编排端点（Gemini 原生 Developer + 兼容层双路径），共 14 项集成测试通过
 - [x] Provider 适配器（OpenAI / Anthropic / **Gemini 原生+兼容层双路径** / 兼容）—— **Task 6-8 已完成**：OpenAIAdapter、AnthropicAdapter、GeminiNativeAdapter（Developer/Vertex 双风格端点路由 + `:countTokens` + 功能性指纹字段提取）、GeminiOpenAICompatAdapter（复用 OpenAI 解析）；包导入即自注册四组合，共 47 项单测通过
 - [x] 检测引擎：异步任务池 + SSE 进度 —— **Task 15 已完成**：`TaskExecutor`（连通性先行短路 / 其余按类别串行+类别内 Semaphore 受控并发 / 逐探针发 SSE 事件 task.started·probe.completed·task.scored·task.completed·task.failed·task.canceled / cancel token 探针边界检查 / 任务级超时兜底 / §11.4 单点失败隔离为 fail 续跑 / 进度计算 / 评分钩子注入不耦合评分细节），共 11 项集成测试通过；任务间全局池待 Task 16
 - [x] 探针边界条件处理（设计 §11.5）—— **Task 14 已完成**：复用既有九类错误模型（`app/utils/errors.py`，不重复定义），新增 `app/probes/boundaries.py`——finish_reason 跨协议正误截断归一（stop/length 正常不计失败、safety/refusal 异常计失败）、流式中断检测（`collect_stream`：部分帧后断连标 incomplete 降级、零帧失败上抛交短路）、空响应判定，共 10 项单测通过；usage 缺失兜底已就地于计费探针处理不重复

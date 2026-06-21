@@ -25,6 +25,10 @@ class Settings(BaseSettings):
     max_concurrent_tasks: int = 2  # 任务间全局并发上限（本地场景建议 2~3）
     default_max_concurrency_per_task: int = 2  # 单任务内同类别探针并发上限
 
+    # ---- 超时（秒）----
+    request_timeout_seconds: float = 30.0  # 单次上游请求超时
+    task_timeout_seconds: float = 300.0  # 单任务总超时兜底（防探针卡死拖垮整任务）
+
     model_config = SettingsConfigDict(
         env_file=".env",
         case_sensitive=False,

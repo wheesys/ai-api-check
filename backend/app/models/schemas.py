@@ -75,13 +75,14 @@ class RelayStationUpdate(_Schema):
 
 
 class RelayStationResponse(_ORMSchema):
-    """中转站响应：严禁包含 api_key。"""
+    """中转站响应：严禁包含 api_key，仅以 has_api_key 标识是否已配置。"""
 
     id: int
     name: str
     protocols: list[Protocol]
     base_url: str
     status: str
+    has_api_key: bool = Field(False, description="是否已配置 API Key（不回显明文/密文）")
     created_at: datetime
     updated_at: datetime
 
