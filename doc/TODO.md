@@ -56,8 +56,19 @@
 - [x] 真实性探针：套壳换底特征 + 逆向/工具转出特征（含 Gemini CLI/AI Studio/Antigravity 逆向特征）—— **Task 12 已完成**：Signal 信号模型（target=shell/direct + direction=confirm/refute + severity 三态 + confidence）、AuthenticityEvidence 证据包、AuthenticitySignalExtractor 独立注册表；四项套壳信号（usage 缺失/特有字段缺失/分词不符/能力大面积失败）+ 五项逆向信号（工具壳痕迹/版本指纹异常/限流模式/直供头缺失/AI Studio 逆向），兼容层置信度自动 ×0.6，skipped 不计负分，共 24 项单测通过；评分聚合待 Task 18-19
 - [x] **Gemini 功能性指纹探针**：搜索接地/URL Context/代码执行/思考/受控输出/缓存/logprobs/Vertex RAG 等偏门功能主动探测 + Studio/Vertex 来源定位（见设计 v0.3 第 7.5 节，仅 native 路径）—— **Task 13 已完成**：`GeminiFeatureProbe` 基类（模板方法统一适用性/预算/错误归类，兼容层整组 applicable=False）；A 组 9 项双向判真伪（思考/代码执行/搜索接地/受控结构化输出/缓存/logprobs/安全评级/token 计数一致性/多模态时间戳，supported→PASS 证真、声称却缺特有字段→FAIL/DEGRADED 证伪、上游 400→skipped 不计负分）+ B 组 4 项单向确证（URL Context/Vertex RAG/Maps 接地/SafetySeverity，supported→PASS 一票确证、任何不支持→skipped 不扣分）；适配器补 logprobs_result 指纹提取，共 38 项单测通过
 - [x] 真实性评分模型（加权 + 分级阈值，阈值可调）—— **Task 17-20 已完成**：`SignalAggregator`（无罪推定从满分扣减：refute 减 Σ(w×sev×conf)、confirm 加回补系数封顶 100 + 逐信号贡献明细）、`AuthenticityScorer`（shell/direct 双子分 + Gemini A 组 PASS 桥接强证真/FAIL·DEGRADED 证伪、B 组 PASS 一票确证锁定 ≥H + 取短板 min）、`ScoreAggregator`（维度加权平均 skipped 不计分母/degraded 半权/fail 计 0 + 真实性维度注入短板值 + 连通性短路标不可用 + 五维度加权总分）、`ConfidenceGrader`（compat×0.6/样本覆盖率折算/单信号误报控制 + 三级阈值 H75/L45 可调），共 56 项单测通过
-- [x] 报告可视化（ECharts）—— 后端 **Task 23 已完成**：`ReportService` 三层结果装配（结果汇总+策略明细+探针下钻）+ 结果/策略/探针记录端点；前端 ECharts 图表待 Phase 6
+- [x] 报告可视化（ECharts）—— 后端 **Task 23 已完成**：`ReportService` 三层结果装配（结果汇总+策略明细+探针下钻）+ 结果/策略/探针记录端点；**前端 Phase 6 已完成**：`BaseChart` 通用封装（暴露 getDataURL 供 PDF 截图）+ `chart_config.js`（五维雷达/真实性双子分柱/性能趋势）
 - [x] PDF 导出（weasyprint）—— **Task 25 已完成**：`PdfService` Jinja2 九区块 A4 模板（CJK 字体/真实性专章/信号贡献表/检测完整性）+ weasyprint 转 PDF + 前端图表 base64 内联；POST 带图表 / GET 纯数据回退端点，PDF 魔数校验 + 不泄露 Key，共 7 项测试通过
+
+---
+
+## 阶段六：前端实现（Vue 3 + Naive UI + ECharts）
+
+- [x] 应用根布局与导航（Task 29）—— `App.vue`：n-config/message/dialog Provider 包裹 + 顶部菜单（中转站管理/检测任务，报告页归属任务模块高亮）+ 路由出口；主色微调
+- [x] 中转站与模型管理（Task 30）—— `StationsView`（折叠列表 + 新建/编辑弹窗 + 删除二次确认）+ `StationForm`（协议集合多选/自定义地址/Key 编辑态留空不改）+ `ModelPanel`（自动拉取逐协议成败反馈 + 失败回退手动录入 + 模型表）
+- [x] 检测任务与 SSE 进度（Task 31）—— `TasksView`（任务列表 + 状态标签 + 跟踪/取消/查看报告）+ `TaskForm`（站点→模型级联选择 + 预算/声明能力高级配置）+ `TaskProgress`（订阅 SSE 实时总进度 + 逐探针状态网格 + 评分/失败原因）
+- [x] 图表与报告（Task 32-33）—— `ReportView`（综合得分卡片 + 真实性研判专章含分级/置信度/信号贡献表 + 五维雷达/真实性柱/性能趋势图 + 策略明细表下钻探针抽屉 + PDF 导出截图内联）+ `BaseChart` + `chart_config.js`
+- [x] 工程化 —— 清理遗留空目录 `app/scoring/`（真实代码在 `backend/app/`）；`npm install` + `vite build` 通过；echarts/naive-ui 拆为可缓存 vendor 分包，页面 chunk 各约 10kB
+- [ ] 前后端联调（启动后端 + `npm run dev` 走通建站→拉模型→检测→报告→导出全链路）
 
 ---
 
